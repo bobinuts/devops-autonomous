@@ -1,0 +1,25 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'helm-chart/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+
+      - name: Configure kubectl
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+
+      - name: Deploy Helm Chart
+        run: |
+          helm upgrade --install mon-app ./helm-chart/mon-app --namespace default --create-namespace
