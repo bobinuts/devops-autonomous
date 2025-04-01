@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: aezule/devops-autonomie
+  repository: bobinuts/mon_app_image
   tag: latest
   pullPolicy: Always
 
