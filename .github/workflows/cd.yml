@@ -36,6 +36,6 @@ jobs:
 
       - name: Deploy Helm Chart
         run: |
-          helm upgrade --install devops-autonomie ./helm-chart/output/devops-autonomie-*.tgz \
-          --set image.repository=${{ secrets.DOCKERHUB_USERNAME }}/devops-autonomie \
+          helm upgrade --install mon_app_image ./helm-chart/output/mon_app_image-*.tgz \
+          --set image.repository=${{ secrets.DOCKERHUB_USERNAME }}/mon_app_image \
           --set image.tag=latest
