@@ -37,6 +37,11 @@ jobs:
       - name: Build Docker image
         run: docker build -t mon_app_image .
 
+      - name: Install Docker Scout CLI
+        run: |
+          curl -L https://desktop.docker.com/scout/cli/linux/docker-scout -o /usr/local/bin/docker-scout
+          chmod +x /usr/local/bin/docker-scout
+
       - name: Run Docker Scout (analyse de vulnérabilités)
         run: docker scout cves mon_app_image
 
