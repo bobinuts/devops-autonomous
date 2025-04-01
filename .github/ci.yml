@@ -1,0 +1,49 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint_and_security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Flake8 for linting
+        run: flake8 .
+
+      - name: Run Bandit for security checks
+        run: bandit -r src/app.py --severity-level high
+
+  docker_build_and_push:
+    needs: lint_and_security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: docker build -t mon_app_image .
+
+      - name: Run Docker Scout (analyse de vulnérabilités)
+        run: docker scout cves mon_app_image
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Tag and Push Docker image
+        run: |
+          docker tag mon_app_image ${{ secrets.DOCKERHUB_USERNAME }}/mon_app_image:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/mon_app_image:latest
